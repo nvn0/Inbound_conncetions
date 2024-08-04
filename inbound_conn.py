@@ -29,7 +29,7 @@ print("Inbound Connections:")
 
 
 def packet_callback(packet):
-    local_ip = get_local_ip()
+    #local_ip = get_local_ip()
     
     
    
@@ -47,18 +47,22 @@ def packet_callback(packet):
             protocol = "TCP"
             port_src = packet[TCP].sport
             port_dst = packet[TCP].dport
+            packet_size = len(packet)
         elif UDP in packet:
             protocol = "UDP"
             port_src = packet[UDP].sport
             port_dst = packet[UDP].dport
+            packet_size = len(packet)
         elif ICMP in packet:
             protocol = "ICMP"
             port_src = "N/A"
             port_dst = "N/A"
+            packet_size = len(packet)
         else:
             protocol = "Other"
             port_src = "N/A"
             port_dst = "N/A"
+            packet_size = len(packet)
             
             
         # Atualiza o contador de tráfego para as portas
@@ -69,7 +73,8 @@ def packet_callback(packet):
                     traffic_counter[port] = 0
                 traffic_counter[port] += len(packet)
         
-        print(f"[{timestamp}] - IP de origem: {ip_src:<15} | Porta de origem: {port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<5} | Data: {traffic_counter.get(port_dst if port_dst != 'N/A' else port_src, 0)} bytes")
+        #print(f"[{timestamp}] - IP de origem: {ip_src:<15} | Porta de origem: {port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<5} | Data: {packet_size} bytes")
+        print(f"[{timestamp}] - IP de origem: {ip_src:<15} | Porta de origem: {port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<4} | Packet size: {packet_size:<5} bytes | Total Data (In this port): {traffic_counter.get(port_dst if port_dst != 'N/A' else port_src, 0):<5} bytes")
         
         #if port_src and port_dst:
             #print(f"IP de origem: {ip_src: <5}, Porta de origem: {port_src: <5}, IP de destino: {ip_dst: <5}, Porta de destino: {port_dst: <5}")
