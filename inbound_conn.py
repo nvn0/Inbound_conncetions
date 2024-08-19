@@ -4,6 +4,7 @@ import socket
 import subprocess
 from datetime import datetime
 import platform
+import requests
 
 #local_ip = "172.30.14.90"
 
@@ -20,11 +21,17 @@ def get_local_ip():
         #print("Local IP:", local_ip)
         return local_ip
     
+
+def get_public_ip():
+    pub_ip = requests.get("https://icanhazip.com").content
+    return pub_ip.decode().rstrip()
+    
+
    
-   
+public_ip = get_public_ip()
 local_ip = get_local_ip()
-print("Local IP:", local_ip)
-print("-----------------------------------")
+print(f"Local IP: {local_ip}       Public IP: {public_ip}")
+print("----------------------------------------------------------")
 print("Inbound Connections:")
 
 
