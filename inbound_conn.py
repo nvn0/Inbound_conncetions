@@ -81,7 +81,12 @@ def packet_callback(packet):
                 traffic_counter[port] += len(packet)
         
         #print(f"[{timestamp}] - IP de origem: {ip_src:<15} | Porta de origem: {port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<5} | Data: {packet_size} bytes")
-        print(f"[{timestamp}] - IP de origem: {ip_src:<15} | Porta de origem: {port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<4} | Packet size: {packet_size:<5} bytes | Total Data (In this port): {traffic_counter.get(port_dst if port_dst != 'N/A' else port_src, 0):<5} bytes")
+        
+        #V1:
+        #print(f"[{timestamp}] - IP de origem: {ip_src:<15} | Porta de origem: {port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<4} | Packet size: {packet_size:<5} bytes | Total Data (In this port): {traffic_counter.get(port_dst if port_dst != 'N/A' else port_src, 0):<5} bytes")
+        
+        #V2:
+        print(f"[{timestamp}] - IP de origem: {ip_src:<15}:{port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<4} | Packet size: {packet_size:<5} bytes | Total Data (In this port): {traffic_counter.get(port_dst if port_dst != 'N/A' else port_src, 0):<5} bytes")
         
         #if port_src and port_dst:
             #print(f"IP de origem: {ip_src: <5}, Porta de origem: {port_src: <5}, IP de destino: {ip_dst: <5}, Porta de destino: {port_dst: <5}")
