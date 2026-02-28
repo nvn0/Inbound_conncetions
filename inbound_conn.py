@@ -11,6 +11,7 @@ import requests
 
 # Dicionário para armazenar a contagem de bytes por porta
 traffic_counter = {}
+conexoes_tcp = set()  # guarda fluxos já vistos
 
 
 def get_local_ip():
@@ -20,7 +21,7 @@ def get_local_ip():
         local_ip = result.stdout.strip()
         #print("Local IP:", local_ip)
         return local_ip
-    
+
 
 def get_public_ip():
     pub_ip = requests.get("https://icanhazip.com").content
@@ -55,6 +56,26 @@ def packet_callback(packet):
             port_src = packet[TCP].sport
             port_dst = packet[TCP].dport
             packet_size = len(packet)
+            
+            # --- Detecção de estado TCP ---
+            flags = packet[TCP].flags
+            fluxo = (ip_src, port_src, ip_dst, port_dst)
+
+            if flags == 'S':  # SYN sem ACK # Novo SYN (cliente inicia ligação)
+                if fluxo not in conexoes_tcp:
+                    conexoes_tcp.add(fluxo)
+                    print(f"[{timestamp}] - IP de origem: {ip_src:<15}:{port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<4} | NOVA ligação TCP (SYN)")
+            elif flags == 'SA':  # SYN+ACK resposta
+                print(f"[{timestamp}] - IP de origem: {ip_src:<15}:{port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<4} | Resposta SYN+ACK")
+                
+            # Ligação já estabelecida (ACK ou PSH+ACK)
+            elif flags == 'A' or flags == 'PA':
+                print(f"[{timestamp}] - IP de origem: {ip_src:<15}:{port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<4} | Ligação já estabelecida (ACK/PSH+ACK)")
+
+            # (Opcional) verificar FIN/RST:
+            elif 'F' in flags or 'R' in flags:
+                print(f"[{timestamp}] - IP de origem: {ip_src:<15}:{port_src:<5} | Porta de destino: {port_dst:<5} | Protocolo: {protocol:<4} | Fecho/RST")
+                
         elif UDP in packet:
             protocol = "UDP"
             port_src = packet[UDP].sport
